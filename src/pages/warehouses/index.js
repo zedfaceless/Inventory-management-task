@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import {
   Container,
   Typography,
+  Box,
   Button,
   Table,
   TableBody,
@@ -10,163 +12,315 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   IconButton,
   Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
   DialogTitle,
-  AppBar,
-  Toolbar,
-  Box,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Alert,
+  Card,
+  CardContent,
+  CircularProgress,
+  Chip,
+  InputAdornment,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import InventoryIcon from '@mui/icons-material/Inventory';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { theme } from '../../styles/theme';
+import Layout from '../../components/common/Layout';
 
-export default function Warehouses() {
+export default function WarehousesPage() {
   const [warehouses, setWarehouses] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [selectedWarehouseId, setSelectedWarehouseId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editingWarehouse, setEditingWarehouse] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [formData, setFormData] = useState({
+    code: '',
+    name: '',
+    location: '',
+  });
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     fetchWarehouses();
   }, []);
 
-  const fetchWarehouses = () => {
-    fetch('/api/warehouses')
-      .then((res) => res.json())
-      .then((data) => setWarehouses(data));
-  };
-
-  const handleClickOpen = (id) => {
-    setSelectedWarehouseId(id);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedWarehouseId(null);
-  };
-
-  const handleDelete = async () => {
+  const fetchWarehouses = async () => {
     try {
-      const res = await fetch(`/api/warehouses/${selectedWarehouseId}`, {
-        method: 'DELETE',
-      });
-
-      if (res.ok) {
-        setWarehouses(warehouses.filter((warehouse) => warehouse.id !== selectedWarehouseId));
-        handleClose();
-      }
-    } catch (error) {
-      console.error('Error deleting warehouse:', error);
+      setLoading(true);
+      const response = await fetch('/api/warehouses');
+      if (!response.ok) throw new Error('Failed to fetch warehouses');
+      const data = await response.json();
+      setWarehouses(data);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleOpenDialog = (warehouse = null) => {
+    if (warehouse) {
+      setEditingWarehouse(warehouse);
+      setFormData({
+        code: warehouse.code,
+        name: warehouse.name,
+        location: warehouse.location,
+      });
+    } else {
+      setEditingWarehouse(null);
+      setFormData({
+        code: '',
+        name: '',
+        location: '',
+      });
+    }
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setEditingWarehouse(null);
+    setFormData({
+      code: '',
+      name: '',
+      location: '',
+    });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const url = editingWarehouse
+        ? `/api/warehouses/${editingWarehouse.id}`
+        : '/api/warehouses';
+      const method = editingWarehouse ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) throw new Error('Failed to save warehouse');
+
+      setSuccessMessage(
+        editingWarehouse ? 'Warehouse updated successfully!' : 'Warehouse created successfully!'
+      );
+      setTimeout(() => setSuccessMessage(''), 3000);
+      
+      fetchWarehouses();
+      handleCloseDialog();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to delete this warehouse?')) return;
+
+    try {
+      const response = await fetch(`/api/warehouses/${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Failed to delete warehouse');
+      
+      setSuccessMessage('Warehouse deleted successfully!');
+      setTimeout(() => setSuccessMessage(''), 3000);
+      
+      fetchWarehouses();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const filteredWarehouses = warehouses.filter(
+    (warehouse) =>
+      warehouse.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      warehouse.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      warehouse.location.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <>
-      <AppBar position="static">
-        <Toolbar>
-          <InventoryIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Inventory Management System
-          </Typography>
-          <Button color="inherit" component={Link} href="/">
-            Dashboard
-          </Button>
-          <Button color="inherit" component={Link} href="/products">
-            Products
-          </Button>
-          <Button color="inherit" component={Link} href="/warehouses">
-            Warehouses
-          </Button>
-          <Button color="inherit" component={Link} href="/stock">
-            Stock Levels
-          </Button>
-        </Toolbar>
-      </AppBar>
-
-      <Container sx={{ mt: 4, mb: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h4" component="h1">
-            Warehouses
-          </Typography>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            component={Link} 
-            href="/warehouses/add"
-          >
-            Add Warehouse
-          </Button>
-        </Box>
-
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>Code</strong></TableCell>
-                <TableCell><strong>Name</strong></TableCell>
-                <TableCell><strong>Location</strong></TableCell>
-                <TableCell><strong>Actions</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {warehouses.map((warehouse) => (
-                <TableRow key={warehouse.id}>
-                  <TableCell>{warehouse.code}</TableCell>
-                  <TableCell>{warehouse.name}</TableCell>
-                  <TableCell>{warehouse.location}</TableCell>
-                  <TableCell>
-                    <IconButton
-                      color="primary"
-                      component={Link}
-                      href={`/warehouses/edit/${warehouse.id}`}
-                      size="small"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleClickOpen(warehouse.id)}
-                      size="small"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {warehouses.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={4} align="center">
-                    No warehouses available.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>Delete Warehouse</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Are you sure you want to delete this warehouse? This action cannot be undone.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose} color="primary">
-              Cancel
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Layout>
+        <Container maxWidth="xl" sx={{ py: 4 }}>
+          {/* Page Header */}
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+            <Box>
+              <Typography variant="h4" component="h1" fontWeight={700} color="primary.dark" gutterBottom>
+                Warehouses
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Manage warehouse locations
+              </Typography>
+            </Box>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => handleOpenDialog()}
+              size="large"
+            >
+              Add Warehouse
             </Button>
-            <Button onClick={handleDelete} color="error" autoFocus>
-              Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Container>
-    </>
+          </Box>
+
+          {/* Success Message */}
+          {successMessage && (
+            <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccessMessage('')}>
+              {successMessage}
+            </Alert>
+          )}
+
+          {/* Error Message */}
+          {error && (
+            <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+              {error}
+            </Alert>
+          )}
+
+          {/* Loading State */}
+          {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+              <CircularProgress size={60} />
+            </Box>
+          ) : (
+            <Card>
+              <CardContent>
+                {/* Search Bar */}
+                <Box mb={3}>
+                  <TextField
+                    placeholder="Search warehouses..."
+                    size="small"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    sx={{ minWidth: 300 }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon sx={{ color: 'text.secondary' }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Showing {filteredWarehouses.length} of {warehouses.length} warehouses
+                  </Typography>
+                </Box>
+
+                {/* Warehouses Table */}
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell><strong>Code</strong></TableCell>
+                        <TableCell><strong>Name</strong></TableCell>
+                        <TableCell><strong>Location</strong></TableCell>
+                        <TableCell align="center"><strong>Actions</strong></TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {filteredWarehouses.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
+                            <Typography color="text.secondary">
+                              {searchTerm ? 'No warehouses match your search' : 'No warehouses yet. Add your first warehouse!'}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        filteredWarehouses.map((warehouse) => (
+                          <TableRow
+                            key={warehouse.id}
+                            sx={{ '&:hover': { backgroundColor: 'action.hover' } }}
+                          >
+                            <TableCell>
+                              <Chip label={warehouse.code} size="small" color="primary" variant="outlined" />
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2" fontWeight={600}>
+                                {warehouse.name}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Box display="flex" alignItems="center" gap={1}>
+                                <LocationOnIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                <Typography variant="body2">{warehouse.location}</Typography>
+                              </Box>
+                            </TableCell>
+                            <TableCell align="center">
+                              <IconButton
+                                size="small"
+                                onClick={() => handleOpenDialog(warehouse)}
+                                color="primary"
+                              >
+                                <EditIcon />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDelete(warehouse.id)}
+                                color="error"
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Add/Edit Dialog */}
+          <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+            <DialogTitle>
+              {editingWarehouse ? 'Edit Warehouse' : 'Add New Warehouse'}
+            </DialogTitle>
+            <DialogContent>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+                <TextField
+                  label="Warehouse Code"
+                  value={formData.code}
+                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                  required
+                  fullWidth
+                  placeholder="e.g., WH-001"
+                />
+                <TextField
+                  label="Warehouse Name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  fullWidth
+                  placeholder="e.g., Main Distribution Center"
+                />
+                <TextField
+                  label="Location"
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  required
+                  fullWidth
+                  placeholder="e.g., Los Angeles, CA"
+                />
+              </Box>
+            </DialogContent>
+            <DialogActions sx={{ px: 3, pb: 3 }}>
+              <Button onClick={handleCloseDialog}>Cancel</Button>
+              <Button onClick={handleSubmit} variant="contained">
+                {editingWarehouse ? 'Update' : 'Create'}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Container>
+      </Layout>
+    </ThemeProvider>
   );
 }
-

@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "ALERT-1768225998254-1",
+    "productId": 1,
+    "productSku": "ECO-UTN-001",
+    "productName": "Bamboo Spork Set",
+    "category": "Utensils",
+    "currentStock": 539,
+    "reorderPoint": 2000,
+    "status": "low",
+    "level": "Low Stock",
+    "priority": 3,
+    "message": "Stock is below 50% of reorder point - plan to reorder soon",
+    "recommendedOrderQuantity": 3461,
+    "estimatedCost": 8652.5,
+    "acknowledged": true,
+    "acknowledgedAt": "2026-01-12T15:01:37.525Z",
+    "resolvedAt": null,
+    "createdAt": "2026-01-12T13:53:18.254Z",
+    "updatedAt": "2026-01-12T15:01:37.525Z"
+  }
+]
