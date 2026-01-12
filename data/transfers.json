@@ -119,5 +119,16 @@
     "notes": "Restocking",
     "createdAt": "2026-01-12T10:34:24.264Z",
     "completedAt": "2026-01-12T10:34:24.264Z"
+  },
+  {
+    "id": "TRF-1768217139155",
+    "productId": 1,
+    "fromWarehouseId": 2,
+    "toWarehouseId": 1,
+    "quantity": 120,
+    "status": "completed",
+    "notes": "Restocking",
+    "createdAt": "2026-01-12T11:25:39.155Z",
+    "completedAt": "2026-01-12T11:25:39.155Z"
   }
 ]
