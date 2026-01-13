@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import {
   Container,
   Typography,
@@ -30,7 +28,6 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
-import { theme } from '../../styles/theme';
 import Layout from '../../components/common/Layout';
 import { formatNumber } from '../../utils/calculations';
 
@@ -175,8 +172,6 @@ export default function StockPage() {
   });
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
       <Layout>
         <Container maxWidth="xl" sx={{ py: 4 }}>
           {/* Page Header */}
@@ -356,6 +351,5 @@ export default function StockPage() {
           )}
         </Container>
       </Layout>
-    </ThemeProvider>
   );
 }

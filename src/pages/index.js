@@ -1,5 +1,3 @@
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import {
   Container,
   Typography,
@@ -16,7 +14,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import InventoryIcon from '@mui/icons-material/Inventory';
 
 // Import custom components
-import { theme } from '../styles/theme';
+
 import Layout from '../components/common/Layout';
 import { useDashboardData } from '../hooks/useDashboardData';
 import MetricCard from '../components/common/MetricCard';
@@ -50,8 +48,6 @@ export default function Home() {
     : 0;
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
       <Layout>
         <Container maxWidth="xl" sx={{ py: 4 }}>
           {/* Page Header */}
@@ -160,6 +156,5 @@ export default function Home() {
           )}
         </Container>
       </Layout>
-    </ThemeProvider>
   );
 }

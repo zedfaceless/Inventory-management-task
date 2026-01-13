@@ -15,6 +15,8 @@ import {
   ListItemText,
   useMediaQuery,
   useTheme,
+  Switch,
+  Tooltip,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -23,7 +25,10 @@ import WarehouseIcon from '@mui/icons-material/Warehouse';
 import CategoryIcon from '@mui/icons-material/Category';
 import TransferWithinAStationIcon from '@mui/icons-material/TransferWithinAStation';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Link from 'next/link';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const drawerWidth = 260;
 
@@ -41,13 +46,14 @@ const Layout = ({ children }) => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { mode, toggleTheme } = useThemeMode();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
   const drawer = (
-    <Box>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Logo/Brand Section */}
       <Toolbar
         sx={{
@@ -70,7 +76,7 @@ const Layout = ({ children }) => {
       <Divider />
 
       {/* Navigation Menu */}
-      <List sx={{ px: 1, py: 2 }}>
+      <List sx={{ px: 1, py: 2, flexGrow: 1 }}>
         {menuItems.map((item) => {
           const isActive = router.pathname === item.path;
           return (
@@ -83,7 +89,7 @@ const Layout = ({ children }) => {
                   borderRadius: 2,
                   '&.Mui-selected': {
                     backgroundColor: 'primary.light',
-                    color: 'primary.dark',
+                    color: mode === 'dark' ? 'primary.contrastText' : 'primary.dark',
                     '&:hover': {
                       backgroundColor: 'primary.light',
                     },
@@ -95,7 +101,9 @@ const Layout = ({ children }) => {
               >
                 <ListItemIcon
                   sx={{
-                    color: isActive ? 'primary.dark' : 'text.secondary',
+                    color: isActive 
+                      ? (mode === 'dark' ? 'primary.contrastText' : 'primary.dark')
+                      : 'text.secondary',
                     minWidth: 40,
                   }}
                 >
@@ -115,8 +123,27 @@ const Layout = ({ children }) => {
 
       <Divider />
 
-      {/* Footer Section */}
-      <Box sx={{ p: 2, mt: 'auto' }}>
+      {/* Theme Toggle Section */}
+      <Box sx={{ p: 2 }}>
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+          <Box display="flex" alignItems="center" gap={1}>
+            {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+            <Typography variant="body2">
+              {mode === 'dark' ? 'Dark Mode' : 'Light Mode'}
+            </Typography>
+          </Box>
+          <Tooltip title={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`}>
+            <Switch
+              checked={mode === 'dark'}
+              onChange={toggleTheme}
+              color="primary"
+            />
+          </Tooltip>
+        </Box>
+
+        <Divider sx={{ mb: 2 }} />
+
+        {/* Footer */}
         <Typography variant="caption" color="text.secondary" display="block">
           Version 1.0.0
         </Typography>
@@ -147,9 +174,14 @@ const Layout = ({ children }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             GreenSupply Co
           </Typography>
+          <Tooltip title={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`}>
+            <IconButton color="inherit" onClick={toggleTheme}>
+              {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
+          </Tooltip>
         </Toolbar>
       </AppBar>
 
@@ -164,7 +196,7 @@ const Layout = ({ children }) => {
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better mobile performance
+            keepMounted: true,
           }}
           sx={{
             display: { xs: 'block', md: 'none' },

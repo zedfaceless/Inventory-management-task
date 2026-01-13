@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import {
   Container,
   Typography,
@@ -10,7 +8,6 @@ import {
   Alert,
 } from '@mui/material';
 
-import { theme } from '../styles/theme';
 import Layout from '../components/common/Layout';
 import TransferForm from '../components/transfers/TransferForm';
 import TransferHistory from '../components/transfers/TransferHistory';
@@ -61,8 +58,6 @@ export default function TransfersPage() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
       <Layout>
         <Container maxWidth="xl" sx={{ py: 4 }}>
           {/* Page Header */}
@@ -113,6 +108,5 @@ export default function TransfersPage() {
           )}
         </Container>
       </Layout>
-    </ThemeProvider>
   );
 }

@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import {
   Container,
   Typography,
@@ -11,7 +9,6 @@ import {
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
-import { theme } from '../styles/theme';
 import Layout from '../components/common/Layout';
 import AlertStats from '../components/alerts/AlertStats';
 import AlertTable from '../components/alerts/AlertTable';
@@ -114,8 +111,6 @@ export default function AlertsPage() {
   const statistics = getAlertStatistics(alerts);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
       <Layout>
         <Container maxWidth="xl" sx={{ py: 4 }}>
           {/* Page Header */}
@@ -170,6 +165,5 @@ export default function AlertsPage() {
           )}
         </Container>
       </Layout>
-    </ThemeProvider>
   );
 }
