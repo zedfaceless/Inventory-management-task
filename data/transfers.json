@@ -130,5 +130,27 @@
     "notes": "Restocking",
     "createdAt": "2026-01-12T11:25:39.155Z",
     "completedAt": "2026-01-12T11:25:39.155Z"
+  },
+  {
+    "id": "TRF-1768398483607",
+    "productId": 1,
+    "fromWarehouseId": 1,
+    "toWarehouseId": 3,
+    "quantity": 100,
+    "status": "completed",
+    "notes": "Restocking",
+    "createdAt": "2026-01-14T13:48:03.607Z",
+    "completedAt": "2026-01-14T13:48:03.607Z"
+  },
+  {
+    "id": "TRF-1768400466954",
+    "productId": 2,
+    "fromWarehouseId": 1,
+    "toWarehouseId": 3,
+    "quantity": 30,
+    "status": "completed",
+    "notes": "Restocking",
+    "createdAt": "2026-01-14T14:21:06.954Z",
+    "completedAt": "2026-01-14T14:21:06.954Z"
   }
 ]

@@ -268,7 +268,7 @@ Good luck! 💪
 
 **Developer:** Melchizedek Galvan Fernandez
 **Completion Time:** 19 hours  
-**Completion Date:** January 13, 2026
+**Completion Date:** January 14, 2026
 
 ### ✅ Features Completed
 
@@ -411,7 +411,7 @@ Good luck! 💪
 
 ### 🎥 Video Walkthrough
 
-[Insert your video link here - YouTube (unlisted), Loom, or similar]
+https://www.youtube.com/watch?v=TsKNkHH_q6c
 
 ### 🙏 Acknowledgments
 
